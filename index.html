@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+  <title>TCS iON · Online Assessment</title>
+  <!-- style.css embedded for single‑file portability -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    :root {
+      --bg: #f2f5fa;
+      --surface: rgba(255,255,255,0.7);
+      --text: #1a2b3c;
+      --primary: #0b2b5e;
+      --primary-light: #1e4a7a;
+      --accent: #0077be;
+      --success: #0f6b3e;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 20px 35px rgba(0,20,40,0.08);
+      --glass: rgba(255,255,255,0.65);
+      --backdrop: blur(16px);
+      --gray-btn: #e5e9f0;
+      --radius: 1.25rem;
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --surface: rgba(15,23,42,0.75);
+      --text: #e2e8f0;
+      --primary: #38bdf8;
+      --primary-light: #7dd3fc;
+      --accent: #0ea5e9;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --border: rgba(255,255,255,0.1);
+      --shadow: 0 20px 35px rgba(0,0,0,0.5);
+      --glass: rgba(15,23,42,0.7);
+      --gray-btn: #1e293b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1300px;
+      background: var(--glass);
+      backdrop-filter: var(--backdrop);
+      -webkit-backdrop-filter: var(--backdrop);
+      border-radius: 2.5rem;
+      box-shadow: var(--shadow);
+      padding: 1.8rem 2rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    button, .nav-btn {
+      cursor: pointer;
+      border: none;
+      background: white;
+      border-radius: 3rem;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: 0.2s;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    button:hover, .nav-btn:hover {
+      background: white;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-light);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-warning {
+      animation: pulse 0.9s infinite;
+      color: var(--danger) !important;
+      font-weight: 700;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    /* login card */
+    .login-card {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      padding: 2.5rem;
+    }
+
+    .input-group {
+      margin: 1.2rem 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border-radius: 2.5rem;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.7);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    /* exam layout */
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .exam-grid {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr;
+      gap: 1.8rem;
+    }
+
+    .question-panel {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.8rem;
+    }
+
+    .options {
+      margin: 1.8rem 0;
+    }
+
+    .option-item {
+      margin: 0.9rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .palette {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.5rem;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .nav-btn {
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 0.2rem;
+      font-weight: 700;
+      border-radius: 0.8rem;
+      background: #d1d5db;
+    }
+
+    .nav-btn.answered {
+      background: #22c55e;
+      color: white;
+    }
+    .nav-btn.current {
+      background: #3b82f6;
+      color: white;
+      border: 2px solid white;
+    }
+    .nav-btn.review {
+      background: #a855f7;
+      color: white;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 750px) {
+      .exam-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- dynamically injected views -->
+  </div>
+
+  <script>
+    // ==================== GLOBAL STATE ====================
+    const STATE = {
+      candidate: { name: '', regNo: '' },
+      questions: [],
+      answers: {},        // { questionId: selectedOption }
+      reviews: {},        // { questionId: true }
+      currentIndex: 0,
+      timerSeconds: 2700, // 45 minutes
+      timerInterval: null,
+      darkMode: false,
+      examStarted: false,
+      confirmedSubmit: false,
+    };
+
+    // ==================== SAMPLE QUESTIONS ====================
+    function generateQuestions() {
+      return [
+        // Part 1: Quantitative Aptitude & Mathematics
+        { id: 1, text: "A jogger running at 9 km/hr alongside a railway track is 240 m ahead of the engine of a 120 m long train running at 45 km/hr in the same direction. In how much time will the train pass the jogger?", options: ["3.6 sec","18 sec","36 sec","72 sec"], correct: 2 },
+        { id: 2, text: "Kim can do a work in 3 days while David can do the same work in 2 days. Both of them finish the work together and get Rs. 150. What is the share of Kim?", options: ["Rs. 30","Rs. 60","Rs. 70","Rs. 75"], correct: 1 },
+        { id: 3, text: "A and B start a business, with A investing the total capital of Rs. 50000, on the condition that B pays A interest @ 10% per annum on his half of the capital. A is a working partner and receives Rs. 1500 per month from the total profit and any profit remaining is equally shared by both of them. At the end of the year, it was found that the income of A is twice that of B. Find the total profit for the year?", options: ["53000","58000","50000","59000"], correct: 3 },
+        { id: 4, text: "Salaries of Ravi and Sumit are in the ratio 2:3. If the salary of each is increased by Rs. 4000, the new ratio becomes 40:57. What is Sumit's present salary?", options: ["Rs. 17,000","Rs. 20,000","Rs. 25,500","None of these"], correct: 3 },
+        { id: 5, text: "A man can row 6 kmph in still water. When the river is running at 1.2 kmph, it takes him 1 hour to row to a place and back. What is the total distance traveled by the man?", options: ["6.24 km","6 km","5.76 km","5.66 km"], correct: 2 },
+        { id: 6, text: "At what rate percent per annum will the simple interest on a sum of money be 2/5 of the amount in 10 years?", options: ["4%","5 2/3 %","6%","6 2/3 %"], correct: 0 },
+        { id: 7, text: "If the area of a circle is 616 sq cm then its circumference?", options: ["78 m","88 m","75 m","70 m"], correct: 1 },
+        { id: 8, text: "The H.C.F and L.C.M of two numbers are 84 and 21 respectively. If the ratio of the two numbers is 1:4, then the larger of the two numbers is:", options: ["12","48","84","108"], correct: 2 },
+        { id: 9, text: "If the sum and difference of two numbers are 20 and 8 respectively, then the difference of their square is:", options: ["12","28","160","180"], correct: 2 },
+        { id: 10, text: "Pipes A and B can fill a tank in 5 and 6 hours respectively. Pipe C can empty it in 12 hours. If all the three pipes are opened together, then the tank will be filled in?", options: ["1 13/17 hours","2 8/11 hours","3 9/17 hours","4 1/2 hours"], correct: 2 },
+        { id: 11, text: "The compound interest on Rs. 30,000 at 7% per annum is Rs. 4347. The period (in years) is?", options: ["2","2 1/2","3","4"], correct: 0 },
+        { id: 12, text: "The average weight of some students in a class is 62 kg. If 8 students of average weight 55 kg leave the class and 13 students of average weight 65 kg join the class, then the average weight of the remaining students in the class is 63.9 kg. The number of students in the class initially was:", options: ["45","55","40","50"], correct: 0 },
+        { id: 13, text: "Ramesh can complete a work in 20 days. Mohan is 66.67% as efficient as Ramesh. Mohan and Ramesh work together. Ramesh leaves after working for some days. The remaining work is done by Mohan in 10 days. After how many days did Ramesh leave the work?", options: ["10 days","6.5 days","8.5 days","8 days"], correct: 3 },
+        { id: 14, text: "When a number x is divided by 9, the remainder is 6. When the same number is divided by 21, the remainder is 12. If x lies between 250 and 450, then what is the sum of all possible values of x?", options: ["1107","855","1044","666"], correct: 1 },
+        { id: 15, text: "A bag contains x+5 yellow balls, 2x+1 blue balls and some red balls. If two balls are drawn one after another from the bag without replacement, then the probability of getting a red and blue ball is 1/6. The total balls in the bag is 4(x+2). Find the number of red balls.", options: ["8","4","6","5"], correct: 3 },
+        { id: 16, text: "The taxi charges in a city consist of a fixed charge together with the charge for the distance travelled in kilometers. When a person travels 72 km he pays Rs. 1107. He pays Rs. 898 for travelling 55 km. What will he have to pay for travelling 45 km?", options: ["Rs. 826","Rs. 740","Rs. 693","Rs. 738"], correct: 3 },
+        // Part 2: Logical Reasoning & Mental Ability
+        { id: 17, text: "Choose out the odd one.", options: ["Dog","Lion","Jackal","Tiger"], correct: 0 },
+        { id: 18, text: "Four of the following five are alike in a certain way and so form a group. Which is the one that does not belong to that group?", options: ["PY8","EK5","RV3","DG2","JR6"], correct: 4 },
+        { id: 19, text: "Odd man out: 1, 2, 4, 8, 16, 32, 64, 96", options: ["4","32","64","96"], correct: 3 },
+        { id: 20, text: "In a coded language ‘HOSPITAL’ is written as ‘32574618’ in the same language ‘POSTAL’ would be written as?", options: ["752618","725618","725168","725681"], correct: 1 },
+        { id: 21, text: "Pointing to a photograph a lady tells Pramod, ’I am the only daughter of this lady and her son is your maternal uncle.’ How is the speaker related to Pramod's father?", options: ["Sister-in-law","Wife","Either (A) or (B)","Neither (A) Nor (B)"], correct: 1 },
+        { id: 22, text: "One afternoon, Manisha and Madhuri were talking to each other face to face in Bhopal on M.G. Road. If Manisha's shadow was exactly to the left of Madhuri, which direction was Manisha facing?", options: ["North","South","East","Data inadequate"], correct: 0 },
+        { id: 23, text: "If the digits in the number \"298490721\" are arranged in descending order, then how many digits remain in the same place?", options: ["2","4","6","5"], correct: 1 },
+        { id: 24, text: "Select the odd one out.", options: ["Kitchenware","Chair","Sofa","Table"], correct: 0 },
+        // Part 3: Verbal Ability & English Language
+        { id: 25, text: "Identify the correct plural form of the word \"Belief\":", options: ["beliefs","believes","belives","beliefings"], correct: 0 },
+        { id: 26, text: "What is the verb form of the word \"Competition\"?", options: ["compete","complete","competent","competence"], correct: 0 },
+        { id: 27, text: "Which of the following prefixes can be placed before the word \"University\" to form a valid word?", options: ["pre","under","over","sub"], correct: 0 },
+        { id: 28, text: "Fill in the blank with the correct preposition: \"Don’t point _____ my mistakes.\"", options: ["in","at","out","for"], correct: 2 },
+        { id: 29, text: "What is the sentence pattern of: \"My sister speaks English very well\"?", options: ["SOA","SVOC","SVD","SVOA"], correct: 3 },
+        { id: 30, text: "Which suffix can be added to the word \"Exist\" to form a valid noun?", options: ["ing","ance","on","ice"], correct: 1 },
+        { id: 31, text: "Choose the correct question tag to complete the sentence: \"I never drink coke, _____\"", options: ["did I?","will I?","do I?","don't I?"], correct: 2 },
+        { id: 32, text: "Identify the tense of the sentence: \"Are you playing tennis?\"", options: ["simple present","simple past","present continuous","past continuous"], correct: 2 },
+        { id: 33, text: "Select the most appropriate Antonym of the given word: Compassionate", options: ["Peerless","Virulent","Antipologinisit","Ruthless"], correct: 3 },
+        { id: 34, text: "For the four-sentence (1 to 4) paragraph below, sentences 1 and 4 are given. From P, Q, R, and S, select the appropriate sentences for 2 and 3 respectively.  The totalitarian regimes established in the 1920s and 1930s grossly violated human rights in their own territories.", options: ["PQ","PR","QS","QP"], correct: 2 },
+        { id: 35, text: "Select the most appropriate option that can substitute the underlined words in the given sentence: \"To create a truly successful movie the director, the writers, actors, and the cinematographers, must work together with other people closely.\"", options: ["Felicitate","Corroborate","Collaborated. Facilitate"], correct: 2 },
+        { id: 36, text: "Read the passage below and answer the question that follows: ... Which of the statements below can be inferred from the passage?", options: ["Choices to be offered to children should be selected by parents","Children should eat only bread or wheat flakes for breakfast","There are situations where children should have absolutely no say","When children say No to something, a new choice should be given."], correct: 0 },
+        { id: 37, text: "Read the passage and answer the question that follows: Scientists and self-help gurus alike argue that spending too much time ruminating on our worries can make us stressed... What message does the last sentence of the paragraph convey?", options: ["It points to the fact that there are scientific studies and research about the effects of mindfulness","It elucidates the harmful effects of mindfulness as a technique of escaping the tyranny of one’s past.","It tells the adherents of mindfulness who celebrate its positive effects that the technique is not without issues","It throws into doubt the usefulness of mindfulness as a therapeutic for de-stressing oneself."], correct: 2 }
+      ];
+    }
+
+    // ==================== UTILS ====================
+    function saveToLocal() {
+      localStorage.setItem('tcs_exam_state', JSON.stringify({
+        answers: STATE.answers,
+        reviews: STATE.reviews,
+        currentIndex: STATE.currentIndex,
+        timerSeconds: STATE.timerSeconds,
+        candidate: STATE.candidate,
+        examStarted: STATE.examStarted,
+      }));
+    }
+
+    function loadFromLocal() {
+      const saved = localStorage.getItem('tcs_exam_state');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          STATE.answers = data.answers || {};
+          STATE.reviews = data.reviews || {};
+          STATE.currentIndex = data.currentIndex || 0;
+          STATE.timerSeconds = data.timerSeconds ?? 1200;
+          STATE.candidate = data.candidate || { name: '', regNo: '' };
+          STATE.examStarted = data.examStarted || false;
+        } catch (e) {}
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    const container = document.getElementById('appContainer');
+
+    function renderLogin() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2 style="text-align:center;">TCS iON</h2>
+          <p style="text-align:center; margin-bottom:1.5rem;">Online Assessment Platform</p>
+          <div class="input-group">
+            <input type="text" id="candidateName" placeholder="Candidate Name" value="${STATE.candidate.name}">
+          </div>
+          <div class="input-group">
+            <input type="text" id="regNumber" placeholder="Register Number" value="${STATE.candidate.regNo}">
+          </div>
+          <button class="primary-btn" id="startExamBtn" style="width:100%;">Start Exam</button>
+          <p style="margin-top:1rem; font-size:0.8rem; text-align:center;">Please fill details to proceed</p>
+        </div>
+      `;
+      document.getElementById('startExamBtn').addEventListener('click', () => {
+        const name = document.getElementById('candidateName').value.trim();
+        const reg = document.getElementById('regNumber').value.trim();
+        if (!name || !reg) {
+          alert('Both fields are required.');
+          return;
+        }
+        STATE.candidate = { name, regNo: reg };
+        saveToLocal();
+        renderInstructions();
+      });
+    }
+
+    function renderInstructions() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2>Exam Instructions</h2>
+          <ul style="margin:1.2rem 0; line-height:1.8;">
+            <li>Total Questions: 30</li>
+            <li>Duration: 45 Minutes</li>
+            <li>Topics: Data Structures, DBMS, Java, Operating Systems</li>
+            <li>Each question carries 1 mark</li>
+            <li>No negative marking</li>
+            <li>Do not refresh the page</li>
+            <li>Submit before timer ends</li>
+          </ul>
+          <label style="display:flex; align-items:center; gap:0.5rem; margin:1rem 0;">
+            <input type="checkbox" id="agreeCheck"> I agree to instructions
+          </label>
+          <button class="primary-btn" id="beginTestBtn" style="width:100%;" disabled>Begin Test</button>
+        </div>
+      `;
+      const check = document.getElementById('agreeCheck');
+      const btn = document.getElementById('beginTestBtn');
+      check.addEventListener('change', () => { btn.disabled = !check.checked; });
+      btn.addEventListener('click', () => {
+        STATE.questions = shuffleArray([...generateQuestions()]);
+        STATE.currentIndex = 0;
+        STATE.timerSeconds = 2700; // 45 minutes
+        STATE.examStarted = true;
+        clearInterval(STATE.timerInterval);
+        startTimer();
+        saveToLocal();
+        renderExam();
+      });
+    }
+
+    function startTimer() {
+      STATE.timerInterval = setInterval(() => {
+        if (STATE.timerSeconds <= 0) {
+          clearInterval(STATE.timerInterval);
+          autoSubmit();
+          return;
+        }
+        STATE.timerSeconds--;
+        saveToLocal();
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timerDisplay');
+      if (!el) return;
+      const mins = Math.floor(STATE.timerSeconds / 60);
+      const secs = STATE.timerSeconds % 60;
+      el.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+      if (STATE.timerSeconds <= 300) {
+        el.classList.add('timer-warning');
+      } else {
+        el.classList.remove('timer-warning');
+      }
+    }
+
+    function autoSubmit() {
+      alert('Time is up! Exam auto-submitted.');
+      renderResult();
+    }
+
+    function renderExam() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selectedAns = STATE.answers[q.id] ?? null;
+      
+      // Determine topic for current question
+      let topic = "";
+      if (q.id <= 8) topic = "Data Structures";
+      else if (q.id <= 16) topic = "DBMS";
+      else if (q.id <= 24) topic = "Java";
+      else topic = "Operating Systems";
+      
+      container.innerHTML = `
+        <div class="exam-header">
+          <div><strong>${STATE.candidate.name}</strong> | ${STATE.candidate.regNo}</div>
+          <div style="display:flex; gap:1rem; align-items:center;">
+            <span id="timerDisplay" style="font-size:1.8rem; font-weight:700;">00:00</span>
+            <button id="darkToggle">🌓</button>
+            <button id="fullscreenBtn">⛶</button>
+          </div>
+        </div>
+        <div class="exam-grid">
+          <div class="question-panel">
+            <span style="background:var(--accent); color:white; padding:0.3rem 0.8rem; border-radius:1rem; font-size:0.8rem;">${topic}</span>
+            <h3>Question ${STATE.currentIndex+1} of 30</h3>
+            <p style="font-size:1.2rem; margin:1rem 0;">${q.text}</p>
+            <div class="options" id="optionsContainer">
+              ${q.options.map((opt, idx) => `
+                <div class="option-item">
+                  <input type="radio" name="questionOption" value="${idx}" id="opt${idx}" ${selectedAns == idx ? 'checked' : ''}>
+                  <label for="opt${idx}">${opt}</label>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex-row" style="margin-top:1.2rem;">
+              <button id="prevBtn">← Previous</button>
+              <button id="saveNextBtn" class="primary-btn">Save & Next</button>
+              <button id="markReviewBtn">🔖 Mark for Review</button>
+              <button id="clearBtn">Clear Response</button>
+            </div>
+          </div>
+          <div class="palette">
+            <h4>Question Palette</h4>
+            <div class="nav-grid" id="paletteGrid"></div>
+            <div class="legend" style="margin-top:1rem;">
+              <p><span style="background:#d1d5db;"></span> Not Visited</p>
+              <p><span style="background:#22c55e;"></span> Answered</p>
+              <p><span style="background:#3b82f6;"></span> Current</p>
+              <p><span style="background:#a855f7;"></span> Review</p>
+            </div>
+            <button id="submitExamBtn" style="width:100%; margin-top:1rem; background:#b91c1c; color:white;">Submit Exam</button>
+          </div>
+        </div>
+      `;
+      updateTimerDisplay();
+      renderPalette();
+      attachExamEvents();
+    }
+
+    function renderPalette() {
+      const grid = document.getElementById('paletteGrid');
+      if (!grid) return;
+      grid.innerHTML = STATE.questions.map((q, idx) => {
+        let cls = '';
+        if (idx === STATE.currentIndex) cls = 'current';
+        else if (STATE.reviews[q.id]) cls = 'review';
+        else if (STATE.answers[q.id] !== undefined) cls = 'answered';
+        
+        // Add topic indicator in tooltip
+        let topic = "";
+        if (q.id <= 8) topic = "DS";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "OS";
+        
+        return `<button class="nav-btn ${cls}" data-index="${idx}" title="Q${q.id} - ${topic}">${idx+1}</button>`;
+      }).join('');
+      document.querySelectorAll('.nav-btn[data-index]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+          STATE.currentIndex = idx;
+          saveToLocal();
+          renderExam();
+        });
+      });
+    }
+
+    function attachExamEvents() {
+      document.getElementById('prevBtn')?.addEventListener('click', () => {
+        if (STATE.currentIndex > 0) {
+          STATE.currentIndex--;
+          saveToLocal();
+          renderExam();
+        }
+      });
+      document.getElementById('saveNextBtn')?.addEventListener('click', () => {
+        saveCurrentAnswer();
+        if (STATE.currentIndex < STATE.questions.length-1) {
+          STATE.currentIndex++;
+        }
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('markReviewBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        STATE.reviews[qid] = !STATE.reviews[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('clearBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        delete STATE.answers[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('darkToggle')?.addEventListener('click', () => {
+        STATE.darkMode = !STATE.darkMode;
+        document.body.classList.toggle('dark', STATE.darkMode);
+      });
+      document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+      document.getElementById('submitExamBtn')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to submit the exam?')) {
+          clearInterval(STATE.timerInterval);
+          renderResult();
+        }
+      });
+      window.addEventListener('beforeunload', (e) => {
+        if (STATE.examStarted) {
+          e.preventDefault();
+          e.returnValue = 'Changes may not be saved.';
+        }
+      });
+    }
+
+    function saveCurrentAnswer() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selected = document.querySelector('input[name="questionOption"]:checked');
+      if (selected) {
+        STATE.answers[q.id] = parseInt(selected.value);
+      }
+    }
+
+    function renderResult() {
+      STATE.examStarted = false;
+      clearInterval(STATE.timerInterval);
+      let correct = 0, attempted = 0;
+      
+      // Calculate topic-wise scores
+      let topicScores = { "Data Structures": { correct: 0, total: 0 }, "DBMS": { correct: 0, total: 0 }, "Java": { correct: 0, total: 0 }, "Operating Systems": { correct: 0, total: 0 } };
+      
+      STATE.questions.forEach(q => {
+        let topic = "";
+        if (q.id <= 8) topic = "Data Structures";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "Operating Systems";
+        
+        topicScores[topic].total++;
+        if (STATE.answers[q.id] !== undefined) {
+          attempted++;
+          if (STATE.answers[q.id] === q.correct) {
+            correct++;
+            topicScores[topic].correct++;
+          }
+        }
+      });
+      
+      const percentage = Math.round((correct / STATE.questions.length) * 100);
+      const pass = percentage >= 50;
+      
+      container.innerHTML = `
+        <div class="login-card" style="max-width:700px;">
+          <h2>Exam Result</h2>
+          <p><strong>Candidate:</strong> ${STATE.candidate.name} (${STATE.candidate.regNo})</p>
+          <div style="background:var(--gray-btn); border-radius:2rem; height:20px; margin:1rem 0;">
+            <div style="width:${percentage}%; background:${pass?'#22c55e':'#ef4444'}; height:100%; border-radius:2rem; transition: width 1s;"></div>
+          </div>
+          <p>Total Attempted: ${attempted} / 30</p>
+          <p>Correct Answers: ${correct} / 30</p>
+          <p>Percentage: ${percentage}%</p>
+          
+          <h4 style="margin-top:1.5rem;">Topic-wise Performance:</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin:1rem 0;">
+            ${Object.entries(topicScores).map(([topic, score]) => `
+              <div style="background:var(--surface); padding:0.8rem; border-radius:1rem;">
+                <strong>${topic}</strong><br>
+                ${score.correct} / ${score.total} correct
+              </div>
+            `).join('')}
+          </div>
+          
+          <h4 style="margin-top:1.5rem;">Review Answers</h4>
+          <div style="overflow-x:auto; max-height:300px;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="background:var(--surface);">
+                  <th style="padding:0.5rem; text-align:left;">Q#</th>
+                  <th style="padding:0.5rem; text-align:left;">Your Answer</th>
+                  <th style="padding:0.5rem; text-align:left;">Correct Answer</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${STATE.questions.map(q => {
+                  const userAnsIdx = STATE.answers[q.id];
+                  const userAns = userAnsIdx !== undefined ? q.options[userAnsIdx] : '<em>Not Answered</em>';
+                  const correctAns = q.options[q.correct];
+                  const correctClass = userAnsIdx === q.correct ? 'color:var(--success);' : 'color:var(--danger);';
+                  return `<tr style="border-top:1px solid var(--border);">
+                    <td style="padding:0.5rem;">${q.id}</td>
+                    <td style="padding:0.5rem;">${userAns}</td>
+                    <td style="padding:0.5rem; ${correctClass}">${correctAns}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <p style="font-weight:bold; font-size:1.3rem; color:${pass?'var(--success)':'var(--danger)'};">
+            ${pass ? '✅ PASS - Congratulations!' : '❌ FAIL - Better luck next time'}
+          </p>
+          <button id="downloadResultBtn" class="primary-btn" style="margin-top:1rem;">Download Result</button>
+          <button id="retakeExamBtn" style="margin-top:1rem; margin-left:0.5rem;">Retake Exam</button>
+        </div>
+      `;
+      
+      document.getElementById('downloadResultBtn').addEventListener('click', () => {
+        window.print();
+      });
+      
+      document.getElementById('retakeExamBtn').addEventListener('click', () => {
+        // Clear exam data and go back to login
+        STATE.answers = {};
+        STATE.reviews = {};
+        STATE.examStarted = false;
+        clearInterval(STATE.timerInterval);
+        localStorage.removeItem('tcs_exam_state');
+        renderLogin();
+      });
+    }
+
+    // ==================== INIT ====================
+    window.addEventListener('load', () => {
+      loadFromLocal();
+      if (STATE.darkMode) document.body.classList.add('dark');
+      if (STATE.examStarted && STATE.questions.length) {
+        startTimer();
+        renderExam();
+      } else if (STATE.candidate.name) {
+        renderInstructions();
+      } else {
+        renderLogin();
+      }
+    });
+  </script>
+</body>
+</html>
