@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+  <title>TCS iON · Online Assessment</title>
+  <!-- style.css embedded for single‑file portability -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    :root {
+      --bg: #f2f5fa;
+      --surface: rgba(255, 255, 255, 0.7);
+      --text: #1a2b3c;
+      --primary: #0b2b5e;
+      --primary-light: #1e4a7a;
+      --accent: #0077be;
+      --success: #0f6b3e;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 20px 35px rgba(0, 20, 40, 0.08);
+      --glass: rgba(255, 255, 255, 0.65);
+      --backdrop: blur(16px);
+      --gray-btn: #e5e9f0;
+      --radius: 1.25rem;
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --surface: rgba(15, 23, 42, 0.75);
+      --text: #e2e8f0;
+      --primary: #38bdf8;
+      --primary-light: #7dd3fc;
+      --accent: #0ea5e9;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+      --glass: rgba(15, 23, 42, 0.7);
+      --gray-btn: #1e293b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1300px;
+      background: var(--glass);
+      backdrop-filter: var(--backdrop);
+      -webkit-backdrop-filter: var(--backdrop);
+      border-radius: 2.5rem;
+      box-shadow: var(--shadow);
+      padding: 1.8rem 2rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    button,
+    .nav-btn {
+      cursor: pointer;
+      border: none;
+      background: white;
+      border-radius: 3rem;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: 0.2s;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    button:hover,
+    .nav-btn:hover {
+      background: white;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-light);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-warning {
+      animation: pulse 0.9s infinite;
+      color: var(--danger) !important;
+      font-weight: 700;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* login card */
+    .login-card {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      padding: 2.5rem;
+    }
+
+    .input-group {
+      margin: 1.2rem 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border-radius: 2.5rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    /* exam layout */
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .exam-grid {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr;
+      gap: 1.8rem;
+    }
+
+    .question-panel {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.8rem;
+    }
+
+    .options {
+      margin: 1.8rem 0;
+    }
+
+    .option-item {
+      margin: 0.9rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .palette {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.5rem;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .nav-btn {
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 0.2rem;
+      font-weight: 700;
+      border-radius: 0.8rem;
+      background: #d1d5db;
+    }
+
+    .nav-btn.answered {
+      background: #22c55e;
+      color: white;
+    }
+
+    .nav-btn.current {
+      background: #3b82f6;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .nav-btn.review {
+      background: #a855f7;
+      color: white;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 750px) {
+      .exam-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- dynamically injected views -->
+  </div>
+
+  <script>
+    // ==================== GLOBAL STATE ====================
+    const STATE = {
+      candidate: { name: '', regNo: '' },
+      questions: [],
+      answers: {},        // { questionId: selectedOption }
+      reviews: {},        // { questionId: true }
+      currentIndex: 0,
+      timerSeconds: 2700, // 45 minutes
+      timerInterval: null,
+      darkMode: false,
+      examStarted: false,
+      confirmedSubmit: false,
+    };
+
+    // ==================== SAMPLE QUESTIONS ====================
+    function generateQuestions() {
+      return [
+        { id: 1, text: "Which of the following computer language is used for Artificial Intelligence?", options: ["FORTRAN", "PROLOG", "C", "COBOL"], correct: 1 },
+        { id: 2, text: "Which of the following is the 1's complement of 10?", options: ["01", "110", "11", "10"], correct: 0 },
+        { id: 3, text: "Binary numbers need more places for counting because:", options: ["They are always big numbers.", "Any number of 0's can be added in front of them.", "Binary base is small.", "0's and 1's have to be properly spaced apart."], correct: 2 },
+        { id: 4, text: "Which access method is used for obtaining a record from a cassette tape?", options: ["Direct", "Sequential", "Random", "All of the above"], correct: 1 },
+        { id: 5, text: "Primitive operations common to all record management systems include:", options: ["Print", "Sort", "Look-up", "All of the above"], correct: 2 },
+        { id: 6, text: "Which of the following is not a logical database structure?", options: ["Tree", "Relational", "Network", "Chain"], correct: 3 },
+        { id: 7, text: "In SQL, which command is used to make permanent changes made since the beginning of a transaction?", options: ["ZIP", "PACK", "COMMIT", "SAVE"], correct: 2 },
+        { id: 8, text: "After you _____ a record, many data management environments require you to save the changes.", options: ["Delete", "Update", "Sort key", "Index"], correct: 1 },
+        { id: 9, text: "A tuple in the relational model is equivalent to a:", options: ["Record", "Field", "File", "Database"], correct: 0 },
+        { id: 10, text: "Which of the following is not a relational database?", options: ["dBASE IV", "4th Dimension", "FoxPro", "Reflex"], correct: 3 },
+        { id: 11, text: "The logical data structure with a one-to-many relationship is a:", options: ["Network", "Tree", "Chain", "Relational"], correct: 1 },
+        { id: 12, text: "In SQL, which command is used to add a column or integrity constraint to a table?", options: ["ADD COLUMN", "INSERT COLUMN", "MODIFY TABLE", "ALTER TABLE"], correct: 3 },
+        { id: 13, text: "In a relational schema, each tuple is divided into fields called:", options: ["Relations", "Domains", "Queries", "All of the above"], correct: 1 },
+        { id: 14, text: "Frames from one LAN can be transmitted to another LAN via a:\n", options: ["Router", "Bridge", "Repeater", "Modem"], correct: 1 },
+        { id: 15, text: "The Internet Control Message Protocol (ICMP):", options: ["Allows gateways to send error and control messages.", "Provides communication between IP software on different machines.", "Reports error conditions to the original source.", "All of the above."], correct: 3 },
+        { id: 16, text: "Which device is used to connect two LANs located at different places?", options: ["Modem", "Cable", "Hub", "Router"], correct: 3 },
+        { id: 17, text: "Which TCP/IP protocol is used to transfer electronic mail?", options: ["FTP", "SNMP", "SMTP", "RPC"], correct: 2 },
+        { id: 18, text: "A network configuration in which all communication passes through a central computer is:", options: ["Bus", "Star", "Ring", "Point-to-point"], correct: 1 },
+        { id: 19, text: "ICMP is:", options: ["A protocol for IP-to-MAC address mapping.", "A file transfer protocol.", "A protocol used to monitor computers.", "A protocol that handles error and control messages."], correct: 3 },
+        { id: 20, text: "The slowest transmission medium is:", options: ["Twisted-pair wire", "Coaxial cable", "Fiber-optic cable", "Microwaves"], correct: 0 },
+        { id: 21, text: "Which command is used to remove a directory?", options: ["rdir", "remove", "rd", "rmdir"], correct: 3 },
+        { id: 22, text: "Which service translates domain names into IP addresses?", options: ["NFS", "SMB", "NIS", "DNS"], correct: 3 },
+        { id: 23, text: "Allowing runnable processes to be temporarily suspended is called:", options: ["Preemptive scheduling", "Non-preemptive scheduling", "Shortest Job First", "First Come First Served"], correct: 0 },
+        { id: 24, text: "Fork is:", options: ["Dispatching a task", "Creating a new job", "Creating a new process", "Increasing task priority"], correct: 2 },
+        { id: 25, text: "Thrashing:", options: ["Is a natural consequence of virtual memory.", "Can always be avoided.", "Always occurs on large computers.", "Can be caused by poor paging algorithms."], correct: 3 },
+        { id: 26, text: "Supervisor state is:", options: ["Never used", "Entered by all programs", "Required to perform any I/O", "Only allowed to the operating system"], correct: 3 },
+        { id: 27, text: "Which HTML tag is used to create a hyperlink?", options: ["<link>", "<a>", "<href>", "<url>"], correct: 1 },
+        { id: 28, text: "Which CSS property changes the text color?", options: ["font-color", "text-color", "color", "background-color"], correct: 2 },
+        { id: 29, text: "Which JavaScript keyword declares a block-scoped variable?", options: ["var", "const", "let", "static"], correct: 2 },
+        { id: 30, text: "Which HTTP method is commonly used to submit form data?", options: ["GET", "POST", "FETCH", "SEND"], correct: 1 },
+        { id: 31, text: "Which port number is the default port for HTTP?", options: ["21", "22", "80", "443"], correct: 2 },
+        { id: 32, text: "Which HTTP status code indicates a resource has been permanently moved?", options: ["301", "302", "404", "500"], correct: 0 },
+        { id: 33, text: "Which port is the default port for HTTPS?", options: ["21", "80", "443", "8080"], correct: 2 },
+        { id: 34, text: "Which CSS property creates a Flexbox container?", options: ["display: grid;", "display: inline;", "display: flex;", "position: flex;"], correct: 2 },
+        { id: 35, text: "Which JavaScript method converts an object into a JSON string?", options: ["JSON.parse()", "JSON.stringify()", "JSON.encode()", "JSON.object()"], correct: 1 },
+        { id: 36, text: "Which of the following is NOT a valid HTTP request method?", options: ["PATCH", "DELETE", "UPDATE", "OPTIONS"], correct: 2 },
+        { id: 37, text: "Which is the correct order of the TCP/IP protocol stack?", options: ["Application → Transport → Internet → Network Access", "Internet → Transport → Application → Network Access", "Transport → Application → Internet → Network Access", "Network Access → Internet → Transport → Application"], correct: 0 },
+        { id: 38, text: "Which HTML attribute improves accessibility by providing alternative text for images?", options: ["title", "alt", "src", "name"], correct: 1 },
+        { id: 39, text: "Which SQL statement is most vulnerable to SQL Injection?", options: ["SELECT * FROM users WHERE username='" + user + "';", "SELECT * FROM users WHERE username=?;", "Prepared Statement with parameters", "Parameterized Query"], correct: 0 },
+        { id: 40, text: "Which browser storage mechanism automatically sends stored data with every HTTP request?", options: ["Local Storage", "Session Storage", "Cookies", "IndexedDB"], correct: 2 }
+      ];
+    }
+
+    // ==================== UTILS ====================
+    function saveToLocal() {
+      localStorage.setItem('tcs_exam_state', JSON.stringify({
+        answers: STATE.answers,
+        reviews: STATE.reviews,
+        currentIndex: STATE.currentIndex,
+        timerSeconds: STATE.timerSeconds,
+        candidate: STATE.candidate,
+        examStarted: STATE.examStarted,
+      }));
+    }
+
+    function loadFromLocal() {
+      const saved = localStorage.getItem('tcs_exam_state');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          STATE.answers = data.answers || {};
+          STATE.reviews = data.reviews || {};
+          STATE.currentIndex = data.currentIndex || 0;
+          STATE.timerSeconds = data.timerSeconds ?? 1200;
+          STATE.candidate = data.candidate || { name: '', regNo: '' };
+          STATE.examStarted = data.examStarted || false;
+        } catch (e) { }
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    const container = document.getElementById('appContainer');
+
+    function renderLogin() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2 style="text-align:center;">TCS iON</h2>
+          <p style="text-align:center; margin-bottom:1.5rem;">Online Assessment Platform</p>
+          <div class="input-group">
+            <input type="text" id="candidateName" placeholder="Candidate Name" value="${STATE.candidate.name}">
+          </div>
+          <div class="input-group">
+            <input type="text" id="regNumber" placeholder="Register Number" value="${STATE.candidate.regNo}">
+          </div>
+          <button class="primary-btn" id="startExamBtn" style="width:100%;">Start Exam</button>
+          <p style="margin-top:1rem; font-size:0.8rem; text-align:center;">Please fill details to proceed</p>
+        </div>
+      `;
+      document.getElementById('startExamBtn').addEventListener('click', () => {
+        const name = document.getElementById('candidateName').value.trim();
+        const reg = document.getElementById('regNumber').value.trim();
+        if (!name || !reg) {
+          alert('Both fields are required.');
+          return;
+        }
+        STATE.candidate = { name, regNo: reg };
+        saveToLocal();
+        renderInstructions();
+      });
+    }
+
+    function renderInstructions() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2>Exam Instructions</h2>
+          <ul style="margin:1.2rem 0; line-height:1.8;">
+            <li>Total Questions: 40</li>
+            <li>Duration: 35 Minutes</li>
+            <li>Topics: Data Structures, DBMS, Java, Operating Systems</li>
+            <li>Each question carries 1 mark</li>
+            <li>No negative marking</li>
+            <li>Do not refresh the page</li>
+            <li>Submit before timer ends</li>
+          </ul>
+          <label style="display:flex; align-items:center; gap:0.5rem; margin:1rem 0;">
+            <input type="checkbox" id="agreeCheck"> I agree to instructions
+          </label>
+          <button class="primary-btn" id="beginTestBtn" style="width:100%;" disabled>Begin Test</button>
+        </div>
+      `;
+      const check = document.getElementById('agreeCheck');
+      const btn = document.getElementById('beginTestBtn');
+      check.addEventListener('change', () => { btn.disabled = !check.checked; });
+      btn.addEventListener('click', () => {
+        STATE.questions = shuffleArray([...generateQuestions()]);
+        STATE.currentIndex = 0;
+        STATE.timerSeconds = 2100; // 35 minutes
+        STATE.examStarted = true;
+        clearInterval(STATE.timerInterval);
+        startTimer();
+        saveToLocal();
+        renderExam();
+      });
+    }
+
+    function startTimer() {
+      STATE.timerInterval = setInterval(() => {
+        if (STATE.timerSeconds <= 0) {
+          clearInterval(STATE.timerInterval);
+          autoSubmit();
+          return;
+        }
+        STATE.timerSeconds--;
+        saveToLocal();
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timerDisplay');
+      if (!el) return;
+      const mins = Math.floor(STATE.timerSeconds / 60);
+      const secs = STATE.timerSeconds % 60;
+      el.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (STATE.timerSeconds <= 300) {
+        el.classList.add('timer-warning');
+      } else {
+        el.classList.remove('timer-warning');
+      }
+    }
+
+    function autoSubmit() {
+      alert('Time is up! Exam auto-submitted.');
+      renderResult();
+    }
+
+    function renderExam() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selectedAns = STATE.answers[q.id] ?? null;
+
+      // Determine topic for current question
+      let topic = "";
+      if (q.id <= 8) topic = "Data Structures";
+      else if (q.id <= 16) topic = "DBMS";
+      else if (q.id <= 24) topic = "Java";
+      else topic = "Operating Systems";
+
+      container.innerHTML = `
+        <div class="exam-header">
+          <div><strong>${STATE.candidate.name}</strong> | ${STATE.candidate.regNo}</div>
+          <div style="display:flex; gap:1rem; align-items:center;">
+            <span id="timerDisplay" style="font-size:1.8rem; font-weight:700;">00:00</span>
+            <button id="darkToggle">🌓</button>
+            <button id="fullscreenBtn">⛶</button>
+          </div>
+        </div>
+        <div class="exam-grid">
+          <div class="question-panel">
+            <span style="background:var(--accent); color:white; padding:0.3rem 0.8rem; border-radius:1rem; font-size:0.8rem;">${topic}</span>
+            <h3>Question ${STATE.currentIndex + 1} of 30</h3>
+            <p style="font-size:1.2rem; margin:1rem 0;">${q.text}</p>
+            <div class="options" id="optionsContainer">
+              ${q.options.map((opt, idx) => `
+                <div class="option-item">
+                  <input type="radio" name="questionOption" value="${idx}" id="opt${idx}" ${selectedAns == idx ? 'checked' : ''}>
+                  <label for="opt${idx}">${opt}</label>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex-row" style="margin-top:1.2rem;">
+              <button id="prevBtn">← Previous</button>
+              <button id="saveNextBtn" class="primary-btn">Save & Next</button>
+              <button id="markReviewBtn">🔖 Mark for Review</button>
+              <button id="clearBtn">Clear Response</button>
+            </div>
+          </div>
+          <div class="palette">
+            <h4>Question Palette</h4>
+            <div class="nav-grid" id="paletteGrid"></div>
+            <div class="legend" style="margin-top:1rem;">
+              <p><span style="background:#d1d5db;"></span> Not Visited</p>
+              <p><span style="background:#22c55e;"></span> Answered</p>
+              <p><span style="background:#3b82f6;"></span> Current</p>
+              <p><span style="background:#a855f7;"></span> Review</p>
+            </div>
+            <button id="submitExamBtn" style="width:100%; margin-top:1rem; background:#b91c1c; color:white;">Submit Exam</button>
+          </div>
+        </div>
+      `;
+      updateTimerDisplay();
+      renderPalette();
+      attachExamEvents();
+    }
+
+    function renderPalette() {
+      const grid = document.getElementById('paletteGrid');
+      if (!grid) return;
+      grid.innerHTML = STATE.questions.map((q, idx) => {
+        let cls = '';
+        if (idx === STATE.currentIndex) cls = 'current';
+        else if (STATE.reviews[q.id]) cls = 'review';
+        else if (STATE.answers[q.id] !== undefined) cls = 'answered';
+
+        // Add topic indicator in tooltip
+        let topic = "";
+        if (q.id <= 8) topic = "DS";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "OS";
+
+        return `<button class="nav-btn ${cls}" data-index="${idx}" title="Q${q.id} - ${topic}">${idx + 1}</button>`;
+      }).join('');
+      document.querySelectorAll('.nav-btn[data-index]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+          STATE.currentIndex = idx;
+          saveToLocal();
+          renderExam();
+        });
+      });
+    }
+
+    function attachExamEvents() {
+      document.getElementById('prevBtn')?.addEventListener('click', () => {
+        if (STATE.currentIndex > 0) {
+          STATE.currentIndex--;
+          saveToLocal();
+          renderExam();
+        }
+      });
+      document.getElementById('saveNextBtn')?.addEventListener('click', () => {
+        saveCurrentAnswer();
+        if (STATE.currentIndex < STATE.questions.length - 1) {
+          STATE.currentIndex++;
+        }
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('markReviewBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        STATE.reviews[qid] = !STATE.reviews[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('clearBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        delete STATE.answers[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('darkToggle')?.addEventListener('click', () => {
+        STATE.darkMode = !STATE.darkMode;
+        document.body.classList.toggle('dark', STATE.darkMode);
+      });
+      document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+      document.getElementById('submitExamBtn')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to submit the exam?')) {
+          clearInterval(STATE.timerInterval);
+          renderResult();
+        }
+      });
+      window.addEventListener('beforeunload', (e) => {
+        if (STATE.examStarted) {
+          e.preventDefault();
+          e.returnValue = 'Changes may not be saved.';
+        }
+      });
+    }
+
+    function saveCurrentAnswer() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selected = document.querySelector('input[name="questionOption"]:checked');
+      if (selected) {
+        STATE.answers[q.id] = parseInt(selected.value);
+      }
+    }
+
+    function renderResult() {
+      STATE.examStarted = false;
+      clearInterval(STATE.timerInterval);
+      let correct = 0, attempted = 0;
+
+      // Calculate topic-wise scores
+      let topicScores = { "Data Structures": { correct: 0, total: 0 }, "DBMS": { correct: 0, total: 0 }, "Java": { correct: 0, total: 0 }, "Operating Systems": { correct: 0, total: 0 } };
+
+      STATE.questions.forEach(q => {
+        let topic = "";
+        if (q.id <= 8) topic = "Data Structures";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "Operating Systems";
+
+        topicScores[topic].total++;
+        if (STATE.answers[q.id] !== undefined) {
+          attempted++;
+          if (STATE.answers[q.id] === q.correct) {
+            correct++;
+            topicScores[topic].correct++;
+          }
+        }
+      });
+
+      const percentage = Math.round((correct / STATE.questions.length) * 100);
+      const pass = percentage >= 50;
+
+      container.innerHTML = `
+        <div class="login-card" style="max-width:700px;">
+          <h2>Exam Result</h2>
+          <p><strong>Candidate:</strong> ${STATE.candidate.name} (${STATE.candidate.regNo})</p>
+          <div style="background:var(--gray-btn); border-radius:2rem; height:20px; margin:1rem 0;">
+            <div style="width:${percentage}%; background:${pass ? '#22c55e' : '#ef4444'}; height:100%; border-radius:2rem; transition: width 1s;"></div>
+          </div>
+          <p>Total Attempted: ${attempted} / 30</p>
+          <p>Correct Answers: ${correct} / 30</p>
+          <p>Percentage: ${percentage}%</p>
+          
+          <h4 style="margin-top:1.5rem;">Topic-wise Performance:</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin:1rem 0;">
+            ${Object.entries(topicScores).map(([topic, score]) => `
+              <div style="background:var(--surface); padding:0.8rem; border-radius:1rem;">
+                <strong>${topic}</strong><br>
+                ${score.correct} / ${score.total} correct
+              </div>
+            `).join('')}
+          </div>
+          
+          <h4 style="margin-top:1.5rem;">Review Answers</h4>
+          <div style="overflow-x:auto; max-height:300px;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="background:var(--surface);">
+                  <th style="padding:0.5rem; text-align:left;">Q#</th>
+                  <th style="padding:0.5rem; text-align:left;">Your Answer</th>
+                  <th style="padding:0.5rem; text-align:left;">Correct Answer</th>
+                  <th style="padding:0.5rem; text-align:left;">Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${STATE.questions.map(q => {
+        const userAnsIdx = STATE.answers[q.id];
+        const userAns = userAnsIdx !== undefined ? q.options[userAnsIdx] : '<em>Not Answered</em>';
+        const correctAns = q.options[q.correct];
+        const correctClass = userAnsIdx === q.correct ? 'color:var(--success);' : 'color:var(--danger);';
+        return `<tr style="border-top:1px solid var(--border);">
+                  <td style="padding:0.5rem;">${q.id}</td>
+                  <td style="padding:0.5rem;">${userAns}</td>
+                  <td style="padding:0.5rem; ${correctClass}">${correctAns}</td>
+                  <td style="padding:0.5rem;">${q.options.map((opt, idx) => {
+                    const isUser = idx === userAnsIdx;
+                    const isCorrect = idx === q.correct;
+                    let style = '' ;
+                    if (isCorrect) style += 'color:var(--success); font-weight:bold;';
+                    if (isUser) style += 'text-decoration:underline;';
+                    return `<div style="${style}">${String.fromCharCode(65+idx)}. ${opt}</div>`;
+                  }).join('')}</td>
+                </tr>`;
+      }).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <p style="font-weight:bold; font-size:1.3rem; color:${pass ? 'var(--success)' : 'var(--danger)'};">
+            ${pass ? '✅ PASS - Congratulations!' : '❌ FAIL - Better luck next time'}
+          </p>
+          <button id="downloadResultBtn" class="primary-btn" style="margin-top:1rem;">Download Result</button>
+          <button id="retakeExamBtn" style="margin-top:1rem; margin-left:0.5rem;">Retake Exam</button>
+        </div>
+      `;
+
+      document.getElementById('downloadResultBtn').addEventListener('click', () => {
+        window.print();
+      });
+
+      document.getElementById('retakeExamBtn').addEventListener('click', () => {
+        // Clear exam data and go back to login
+        STATE.answers = {};
+        STATE.reviews = {};
+        STATE.examStarted = false;
+        clearInterval(STATE.timerInterval);
+        localStorage.removeItem('tcs_exam_state');
+        renderLogin();
+      });
+    }
+
+    // ==================== INIT ====================
+    window.addEventListener('load', () => {
+      loadFromLocal();
+      if (STATE.darkMode) document.body.classList.add('dark');
+      if (STATE.examStarted && STATE.questions.length) {
+        startTimer();
+        renderExam();
+      } else if (STATE.candidate.name) {
+        renderInstructions();
+      } else {
+        renderLogin();
+      }
+    });
+  </script>
+</body>
+
+</html>

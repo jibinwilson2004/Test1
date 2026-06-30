@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+  <title>TCS iON · Online Assessment</title>
+  <!-- style.css embedded for single‑file portability -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    :root {
+      --bg: #f2f5fa;
+      --surface: rgba(255, 255, 255, 0.7);
+      --text: #1a2b3c;
+      --primary: #0b2b5e;
+      --primary-light: #1e4a7a;
+      --accent: #0077be;
+      --success: #0f6b3e;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 20px 35px rgba(0, 20, 40, 0.08);
+      --glass: rgba(255, 255, 255, 0.65);
+      --backdrop: blur(16px);
+      --gray-btn: #e5e9f0;
+      --radius: 1.25rem;
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --surface: rgba(15, 23, 42, 0.75);
+      --text: #e2e8f0;
+      --primary: #38bdf8;
+      --primary-light: #7dd3fc;
+      --accent: #0ea5e9;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+      --glass: rgba(15, 23, 42, 0.7);
+      --gray-btn: #1e293b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1300px;
+      background: var(--glass);
+      backdrop-filter: var(--backdrop);
+      -webkit-backdrop-filter: var(--backdrop);
+      border-radius: 2.5rem;
+      box-shadow: var(--shadow);
+      padding: 1.8rem 2rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    button,
+    .nav-btn {
+      cursor: pointer;
+      border: none;
+      background: white;
+      border-radius: 3rem;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: 0.2s;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    button:hover,
+    .nav-btn:hover {
+      background: white;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-light);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-warning {
+      animation: pulse 0.9s infinite;
+      color: var(--danger) !important;
+      font-weight: 700;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* login card */
+    .login-card {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      padding: 2.5rem;
+    }
+
+    .input-group {
+      margin: 1.2rem 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border-radius: 2.5rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    /* exam layout */
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .exam-grid {
+  display: grid;
+  grid-template-columns: 2fr minmax(250px, 300px);
+  gap: 1.8rem;
+  height: calc(100vh - 2rem);
+}
+
+    .question-panel {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.8rem;
+    }
+
+    .options {
+      margin: 1.8rem 0;
+    }
+
+    .option-item {
+      margin: 0.9rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .palette {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 1.5rem;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .nav-btn {
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 0.2rem;
+      font-weight: 700;
+      border-radius: 0.8rem;
+      background: #d1d5db;
+    }
+
+    .nav-btn.answered {
+      background: #22c55e;
+      color: white;
+    }
+
+    .nav-btn.current {
+      background: #3b82f6;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .nav-btn.review {
+      background: #a855f7;
+      color: white;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 750px) {
+      .exam-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        max-width: 90%;
+        padding: 1.5rem;
+      }
+
+      .app-container {
+        padding: 1rem;
+      }
+
+      .exam-grid {
+        gap: 1rem;
+      }
+
+      button,
+      .nav-btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .login-card {
+        max-width: 90%;
+        padding: 2rem;
+      }
+
+      .exam-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      .nav-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .app-container {
+        padding: 1rem 1.5rem;
+      }
+    }
+
+    .exam-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .app-container {
+      padding: 1rem 1.5rem;
+    }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- dynamically injected views -->
+  </div>
+
+  <script>
+    // ==================== GLOBAL STATE ====================
+    const STATE = {
+      candidate: { name: '', regNo: '' },
+      questions: [],
+      answers: {},        // { questionId: selectedOption }
+      reviews: {},        // { questionId: true }
+      currentIndex: 0,
+      timerSeconds: 4500, // 45 minutes
+      timerInterval: null,
+      darkMode: false,
+      examStarted: false,
+      confirmedSubmit: false,
+    };
+
+    // ==================== SAMPLE QUESTIONS ====================
+    function generateQuestions() {
+      return [
+        { id: 1, text: "The average cost of 5 apples and 4 mangoes is Rs. 36. The average cost of 7 apples and 8 mangoes is Rs. 48. Find the total cost of 24 apples and 24 mangoes.", options: ["Rs. 1044", "Rs. 2088", "Rs. 720", "Rs. 324"], correct: 1 },
+        { id: 2, text: "A courtyard is 15 metres long and 10 metres wide. If it is paved by bricks of length 20 cm and width 10 cm, then what is the number of bricks required?", options: ["4500", "6000", "7500", "9000"], correct: 2 },
+        { id: 3, text: "In a class the average marks obtained by a boy is 76, and the average marks obtained by a girl is 80. The average marks obtained by a student of the class is 77.75. Find the total number of students in the class if there are 42 girls.", options: ["100", "93", "96", "104"], correct: 2 },
+        { id: 4, text: "There are three numbers in the ratio 1:2:3. The difference between the greatest number and the least number is 8. Which is the greatest of the three numbers?", options: ["8", "16", "12", "18"], correct: 2 },
+        { id: 5, text: "A train travels from station X to station Y at the rate of 20 km/hr and returns at the rate of 30 km/hr. The average speed for the whole journey was", options: ["25 km/hr", "24 km/hr", "35 km/hr", "40 km/hr"], correct: 1 },
+        { id: 6, text: "If the sides of a square of side 10 units are increased by 50%, then by what percentage does the area of the square increase?", options: ["100%", "50%", "125%", "250%"], correct: 2 },
+        { id: 7, text: "If x : y = 2 : 3 and z : y = 7 : 6, then what is the value of x : z?", options: ["7 : 9", "4 : 7", "7 : 4", "9 : 7"], correct: 1 },
+        { id: 8, text: "The population of a village is 1500. If the rate of increase in the population is 10%, then what will be the population of the village after two years?", options: ["1600", "1815", "1800", "1915"], correct: 1 },
+        { id: 9, text: "If the ratio of interest earned is 2 : 3 : 5, at 7%, then the principal amounts are", options: ["Rs. 2000, Rs. 3000, Rs. 5000", "Rs. 14000, Rs. 21000, Rs. 35000", "Rs. 1500, Rs. 3000, Rs. 6000", "Data insufficient"], correct: 3 },
+        { id: 10, text: "Walking at 5 km/hr, a person covers a certain distance in 4 hours. How much time will he take to cover the same distance if he travels by cycle at twice his walking speed?", options: ["1 hour", "2 hours", "3 hours", "4 hours"], correct: 1 },
+        { id: 11, text: "A gun and a target are separated by 500 metres. You are standing exactly equidistant from both the gun and the target, but not in the line of fire. You hear the sound of the target being hit exactly 4 seconds after you heard the gun being fired. Find the speed of the bullet.", options: ["125 m/s", "62.5 m/s", "250 m/s", "None of these"], correct: 0 },
+        { id: 12, text: "If 12 men take 15 days to do a piece of work, how many days will 6 men take to do the same work?", options: ["7.5", "15", "30", "45"], correct: 2 },
+        { id: 13, text: "Ten men can paint a room in 3 hours. How many hours would 5 men take to paint the room, if they work at the same speed?", options: ["6 hours", "1.5 hours", "10 hours", "4 hours"], correct: 0 },
+        { id: 14, text: "A man spends Rs. 7000 and saves 12.5% of his income each month. What is his monthly income?", options: ["7400", "7700", "8000", "8300"], correct: 2 },
+        { id: 15, text: "In an examination, 62% of the people passed. If the number of people who failed is 342, what is the total number of people who wrote the examination?", options: ["1800", "900", "770", "1200"], correct: 1 },
+        { id: 16, text: "Mihir's salary increases by 12% once every four months. If his salary at the beginning of the year was Rs. 8500, what would his salary be at the end of the year?", options: ["Rs. 9520", "Rs. 10662", "Rs. 11941", "None of the options"], correct: 3 },
+        { id: 17, text: "A man buys 20 items every quarter, and his purchase increases by 12 in every following quarter. What is the total percentage increase in the items that he bought over the previous year?", options: ["1", "1.2", "1.7", "None of the options"], correct: 3 },
+        { id: 18, text: "A die is thrown. If E is the event \"the number appearing is a multiple of 3\" and F is the event \"the number appearing is even\", then E and F are", options: ["Independent", "Dependent", "Either independent or dependent", "None of these"], correct: 0 },
+        { id: 19, text: "A bag contains 9 discs of which 4 are red, 3 are blue and 2 are yellow. The probability that it will be either red or blue is", options: ["3/8", "8/9", "7/9", "4/9"], correct: 2 },
+        { id: 20, text: "The four walls of a room of length 10 ft, breadth 8 ft and height 10 ft need to be painted. On one wall there is a painting measuring 5 ft × 2 ft which is not to be painted. What is the cost of painting at Rs.20 per square foot?", options: ["Rs.7000", "Rs.15800", "Rs.16000", "Rs.12600"], correct: 0 },
+        { id: 21, text: "Find the next number in the series: 41, 43, 47, 53, 59, ?", options: ["61", "63", "65", "67", "69"], correct: 3 },
+        { id: 22, text: "0.38 = ? % of 380", options: ["10", "100", "1000", "0.1", "1"], correct: 0 },
+        { id: 23, text: "Which of the following is not a prime number?", options: ["221", "101", "103", "107", "113"], correct: 0 },
+        { id: 24, text: "Find the HCF of 1739 and 1927.", options: ["41", "82", "47", "188", "94"], correct: 2 },
+        { id: 25, text: "The HCF and LCM of two numbers are 24 and 720 respectively. If one of the numbers is 144, find the other number.", options: ["130", "144", "120", "140", "None of these"], correct: 2 },
+        { id: 26, text: "How many times is the HCF of 48, 36, 72 and 24 contained in their LCM?", options: ["8", "10", "12", "14", "16"], correct: 2 },
+        { id: 27, text: "The sum of two numbers is 528 and their HCF is 33. How many pairs of such numbers can be formed?", options: ["2", "4", "3", "8", "None of these"], correct: 1 },
+        { id: 28, text: "Find the least number which, upon being divided by 2,3,4,5 and 6, leaves a remainder of 1, but when divided by 7 leaves no remainder.", options: ["61", "601", "201", "299", "301"], correct: 4 },
+        { id: 29, text: "Which is the least multiple of 7, which when divided by 2,3,4,5 and 6, leaves the remainders 1,2,3,4 and 5 respectively?", options: ["59", "61", "60", "119", "129"], correct: 3 },
+        { id: 30, text: "Find the least number which when divided by 2,3,4,5 and 6 leaves the remainders 1,2,3,4 and 5 respectively.", options: ["60", "61", "59", "720", "719"], correct: 0 },
+        { id: 31, text: "Find the least number which when divided by 6,7,8 and 9 leaves a remainder of 2.", options: ["506", "504", "502", "3024", "3026"], correct: 2 },
+        { id: 32, text: "All pens are pencils. Some pencils are books.", options: ["Some pens are books", "Some books are pens", "No book is a pen", "Some pens are not books", "None of the above"], correct: 4 },
+        { id: 33, text: "All cats are animals. No animal is a dog.", options: ["No cat is a dog", "Some cats are not dogs", "Some dogs are not cats", "No dog is a cat", "All the above"], correct: 4 },
+        { id: 34, text: "All flowers are beautiful. Rose is a flower.", options: ["Rose is beautiful", "Rose is not a flower", "Either (a) or (b)", "Data insufficient", "None of these"], correct: 0 },
+        { id: 35, text: "Which word is least like the other three?", options: ["Tiny", "Large", "Miniature", "Small"], correct: 1 },
+
+        { id: 36, text: "Hand is to Glove as Head is to:", options: ["Hair", "Neck", "Earrings", "Hat"], correct: 3 },
+        { id: 37, text: "Which one does not belong to the group?", options: ["Cube", "Rectangle", "Hexagon", "Triangle"], correct: 0 },
+        { id: 38, text: "If you rearrange the letters \"ABER\", what would you have the name of?", options: ["Automobile", "Town", "Animal", "Vegetable"], correct: 2 },
+        { id: 39, text: "Which number does not belong in the following sequence? 1, 2, 4, 9, 16, 32, ...", options: ["Four", "Nine", "One", "Sixteen"], correct: 1 },
+        {
+          id: 40, text: "The simple interest on a certain sum of money for 3 years is 225 and the compound interest on the same sum at the same rate for 2 years is 153. The principal invested is",
+          options: ["1500", "2250", "3000", "1875"], correct: 3
+        },
+        { id: 41, text: "All pens are pencils. Some pencils are books.", options: ["Some pens are books", "Some books are pens", "No book is a pen", "Some pens are not books", "None of the above"], correct: 4 },
+        { id: 42, text: "All cats are animals. No animal is a dog.", options: ["No cat is a dog", "Some cats are not dogs", "Some dogs are not cats", "No dog is a cat", "All the above"], correct: 4 },
+        { id: 43, text: "All flowers are beautiful. Rose is a flower.", options: ["Rose is beautiful", "Rose is not a flower", "Either (a) or (b)", "Data insufficient", "None of these"], correct: 0 },
+        { id: 44, text: "No car is a wheel. Some wheels are not buses.", options: ["Some buses are not cars", "Some cars are not buses", "Some wheels are buses", "Some wheels are not cars", "None of the above"], correct: 3 },
+        { id: 45, text: "All apples are fruits. All fruits are vegetables.", options: ["Some vegetables are not apples", "All vegetables are apples", "All apples are vegetables", "No apple is a vegetable", "None of the above"], correct: 2 },
+        { id: 46, text: "All teachers are good. Some women are not teachers.", options: ["Some women are good", "Some women are not good", "Some teachers are not good", "All women are good", "None of these"], correct: 4 },
+        { id: 47, text: "All cakes are ice-creams. All ice-creams are toffees.", options: ["No cake is a toffee", "Some toffees are cakes", "Some cakes are not toffees", "All cakes are toffees", "Both (b) and (d)"], correct: 4 },
+        { id: 48, text: "All students in my class are intelligent. Rohit is not intelligent.", options: ["Rohit is not a student in my class", "Rohit must work hard", "Rohit is my classmate", "Rohit is the Principal", "Rohit need not work hard"], correct: 0 },
+        { id: 49, text: "Some parrots are crows. Some flowers are not crows.", options: ["Some parrots are not flowers", "Some flowers are not parrots", "Some flowers are parrots", "All flowers are not parrots", "None of the above"], correct: 4 },
+        { id: 50, text: "All locks are keys. No key is a spoon.", options: ["All spoons are locks", "No lock is a spoon", "Some locks are spoons", "No lock is a key", "None of these"], correct: 1 }
+      ];
+    }
+
+    // ==================== UTILS ====================
+    function saveToLocal() {
+      localStorage.setItem('tcs_exam_state', JSON.stringify({
+        answers: STATE.answers,
+        reviews: STATE.reviews,
+        currentIndex: STATE.currentIndex,
+        timerSeconds: STATE.timerSeconds,
+        candidate: STATE.candidate,
+        examStarted: STATE.examStarted,
+      }));
+    }
+
+    function loadFromLocal() {
+      const saved = localStorage.getItem('tcs_exam_state');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          STATE.answers = data.answers || {};
+          STATE.reviews = data.reviews || {};
+          STATE.currentIndex = data.currentIndex || 0;
+          STATE.timerSeconds = data.timerSeconds ?? 4500;
+          STATE.candidate = data.candidate || { name: '', regNo: '' };
+          STATE.examStarted = data.examStarted || false;
+        } catch (e) { }
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    const container = document.getElementById('appContainer');
+
+    function renderLogin() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2 style="text-align:center;">TCS iON</h2>
+          <p style="text-align:center; margin-bottom:1.5rem;">Online Assessment Platform</p>
+          <div class="input-group">
+            <input type="text" id="candidateName" placeholder="Candidate Name" value="${STATE.candidate.name}">
+          </div>
+          <div class="input-group">
+            <input type="text" id="regNumber" placeholder="Register Number" value="${STATE.candidate.regNo}">
+          </div>
+          <button class="primary-btn" id="startExamBtn" style="width:100%;">Start Exam</button>
+          <p style="margin-top:1rem; font-size:0.8rem; text-align:center;">Please fill details to proceed</p>
+        </div>
+      `;
+      document.getElementById('startExamBtn').addEventListener('click', () => {
+        const name = document.getElementById('candidateName').value.trim();
+        const reg = document.getElementById('regNumber').value.trim();
+        if (!name || !reg) {
+          alert('Both fields are required.');
+          return;
+        }
+        STATE.candidate = { name, regNo: reg };
+        saveToLocal();
+        renderInstructions();
+      });
+    }
+
+    function renderInstructions() {
+      container.innerHTML = `
+        <div class="login-card">
+          <h2>Exam Instructions</h2>
+          <ul style="margin:1.2rem 0; line-height:1.8;">
+            <li>Total Questions: ${generateQuestions().length}</li>
+            <li>Duration: 75 Minutes</li>
+            <li>Topics: Data Structures, DBMS, Java, Operating Systems</li>
+            <li>Each question carries 1 mark</li>
+            <li>No negative marking</li>
+            <li>Do not refresh the page</li>
+            <li>Submit before timer ends</li>
+          </ul>
+          <label style="display:flex; align-items:center; gap:0.5rem; margin:1rem 0;">
+            <input type="checkbox" id="agreeCheck"> I agree to instructions
+          </label>
+          <button class="primary-btn" id="beginTestBtn" style="width:100%;" disabled>Begin Test</button>
+        </div>
+      `;
+      const check = document.getElementById('agreeCheck');
+      const btn = document.getElementById('beginTestBtn');
+      check.addEventListener('change', () => { btn.disabled = !check.checked; });
+      btn.addEventListener('click', () => {
+        STATE.questions = shuffleArray([...generateQuestions()]);
+        STATE.currentIndex = 0;
+        STATE.timerSeconds = 4500// 35 minutes
+        STATE.examStarted = true;
+        clearInterval(STATE.timerInterval);
+        startTimer();
+        saveToLocal();
+        renderExam();
+      });
+    }
+
+    function startTimer() {
+      STATE.timerInterval = setInterval(() => {
+        if (STATE.timerSeconds <= 0) {
+          clearInterval(STATE.timerInterval);
+          autoSubmit();
+          return;
+        }
+        STATE.timerSeconds--;
+        saveToLocal();
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timerDisplay');
+      if (!el) return;
+      const mins = Math.floor(STATE.timerSeconds / 60);
+      const secs = STATE.timerSeconds % 60;
+      el.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (STATE.timerSeconds <= 300) {
+        el.classList.add('timer-warning');
+      } else {
+        el.classList.remove('timer-warning');
+      }
+    }
+
+    function autoSubmit() {
+      alert('Time is up! Exam auto-submitted.');
+      renderResult();
+    }
+
+    function renderExam() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selectedAns = STATE.answers[q.id] ?? null;
+
+      // Determine topic for current question
+      let topic = "";
+      if (q.id <= 8) topic = "Data Structures";
+      else if (q.id <= 16) topic = "DBMS";
+      else if (q.id <= 24) topic = "Java";
+      else topic = "Operating Systems";
+
+      container.innerHTML = `
+        <div class="exam-header">
+          <div><strong>${STATE.candidate.name}</strong> | ${STATE.candidate.regNo}</div>
+          <div style="display:flex; gap:1rem; align-items:center;">
+            <span id="timerDisplay" style="font-size:1.8rem; font-weight:700;">00:00</span>
+            <button id="darkToggle">🌓</button>
+            <button id="fullscreenBtn">⛶</button>
+          </div>
+        </div>
+        <div class="exam-grid">
+          <div class="question-panel">
+            <span style="background:var(--accent); color:white; padding:0.3rem 0.8rem; border-radius:1rem; font-size:0.8rem;">${topic}</span>
+            <h3>Question ${STATE.currentIndex + 1} of 30</h3>
+            <p style="font-size:1.2rem; margin:1rem 0;">${q.text}</p>
+            <div class="options" id="optionsContainer">
+              ${q.options.map((opt, idx) => `
+                <div class="option-item">
+                  <input type="radio" name="questionOption" value="${idx}" id="opt${idx}" ${selectedAns == idx ? 'checked' : ''}>
+                  <label for="opt${idx}">${opt}</label>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex-row" style="margin-top:1.2rem;">
+              <button id="prevBtn">← Previous</button>
+              <button id="saveNextBtn" class="primary-btn">Save & Next</button>
+              <button id="markReviewBtn">🔖 Mark for Review</button>
+              <button id="clearBtn">Clear Response</button>
+            </div>
+          </div>
+          <div class="palette">
+            <h4>Question Palette</h4>
+            <div class="nav-grid" id="paletteGrid"></div>
+            <div class="legend" style="margin-top:1rem;">
+              <p><span style="background:#d1d5db;"></span> Not Visited</p>
+              <p><span style="background:#22c55e;"></span> Answered</p>
+              <p><span style="background:#3b82f6;"></span> Current</p>
+              <p><span style="background:#a855f7;"></span> Review</p>
+            </div>
+            <button id="submitExamBtn" style="width:100%; margin-top:1rem; background:#b91c1c; color:white;">Submit Exam</button>
+          </div>
+        </div>
+      `;
+      updateTimerDisplay();
+      renderPalette();
+      attachExamEvents();
+    }
+
+    function renderPalette() {
+      const grid = document.getElementById('paletteGrid');
+      if (!grid) return;
+      grid.innerHTML = STATE.questions.map((q, idx) => {
+        let cls = '';
+        if (idx === STATE.currentIndex) cls = 'current';
+        else if (STATE.reviews[q.id]) cls = 'review';
+        else if (STATE.answers[q.id] !== undefined) cls = 'answered';
+
+        // Add topic indicator in tooltip
+        let topic = "";
+        if (q.id <= 8) topic = "DS";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "OS";
+
+        return `<button class="nav-btn ${cls}" data-index="${idx}" title="Q${q.id} - ${topic}">${idx + 1}</button>`;
+      }).join('');
+      document.querySelectorAll('.nav-btn[data-index]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+          STATE.currentIndex = idx;
+          saveToLocal();
+          renderExam();
+        });
+      });
+    }
+
+    function attachExamEvents() {
+      document.getElementById('prevBtn')?.addEventListener('click', () => {
+        if (STATE.currentIndex > 0) {
+          STATE.currentIndex--;
+          saveToLocal();
+          renderExam();
+        }
+      });
+      document.getElementById('saveNextBtn')?.addEventListener('click', () => {
+        saveCurrentAnswer();
+        if (STATE.currentIndex < STATE.questions.length - 1) {
+          STATE.currentIndex++;
+        }
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('markReviewBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        STATE.reviews[qid] = !STATE.reviews[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('clearBtn')?.addEventListener('click', () => {
+        const qid = STATE.questions[STATE.currentIndex].id;
+        delete STATE.answers[qid];
+        saveToLocal();
+        renderExam();
+      });
+      document.getElementById('darkToggle')?.addEventListener('click', () => {
+        STATE.darkMode = !STATE.darkMode;
+        document.body.classList.toggle('dark', STATE.darkMode);
+      });
+      document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+      document.getElementById('submitExamBtn')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to submit the exam?')) {
+          clearInterval(STATE.timerInterval);
+          renderResult();
+        }
+      });
+      window.addEventListener('beforeunload', (e) => {
+        if (STATE.examStarted) {
+          e.preventDefault();
+          e.returnValue = 'Changes may not be saved.';
+        }
+      });
+    }
+
+    function saveCurrentAnswer() {
+      const q = STATE.questions[STATE.currentIndex];
+      const selected = document.querySelector('input[name="questionOption"]:checked');
+      if (selected) {
+        STATE.answers[q.id] = parseInt(selected.value);
+      }
+    }
+
+    function renderResult() {
+      STATE.examStarted = false;
+      clearInterval(STATE.timerInterval);
+      let correct = 0, attempted = 0;
+
+      // Calculate topic-wise scores
+      let topicScores = { "Data Structures": { correct: 0, total: 0 }, "DBMS": { correct: 0, total: 0 }, "Java": { correct: 0, total: 0 }, "Operating Systems": { correct: 0, total: 0 } };
+
+      STATE.questions.forEach(q => {
+        let topic = "";
+        if (q.id <= 8) topic = "Data Structures";
+        else if (q.id <= 16) topic = "DBMS";
+        else if (q.id <= 24) topic = "Java";
+        else topic = "Operating Systems";
+
+        topicScores[topic].total++;
+        if (STATE.answers[q.id] !== undefined) {
+          attempted++;
+          if (STATE.answers[q.id] === q.correct) {
+            correct++;
+            topicScores[topic].correct++;
+          }
+        }
+      });
+
+      const percentage = Math.round((correct / STATE.questions.length) * 100);
+      const pass = percentage >= 50;
+
+      container.innerHTML = `
+        <div class="login-card" style="max-width:700px;">
+          <h2>Exam Result</h2>
+          <p><strong>Candidate:</strong> ${STATE.candidate.name} (${STATE.candidate.regNo})</p>
+          <div style="background:var(--gray-btn); border-radius:2rem; height:20px; margin:1rem 0;">
+            <div style="width:${percentage}%; background:${pass ? '#22c55e' : '#ef4444'}; height:100%; border-radius:2rem; transition: width 1s;"></div>
+          </div>
+          <p>Total Attempted: ${attempted} / 30</p>
+          <p>Correct Answers: ${correct} / 30</p>
+          <p>Percentage: ${percentage}%</p>
+          
+          <h4 style="margin-top:1.5rem;">Topic-wise Performance:</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin:1rem 0;">
+            ${Object.entries(topicScores).map(([topic, score]) => `
+              <div style="background:var(--surface); padding:0.8rem; border-radius:1rem;">
+                <strong>${topic}</strong><br>
+                ${score.correct} / ${score.total} correct
+              </div>
+            `).join('')}
+          </div>
+          
+          <h4 style="margin-top:1.5rem;">Review Answers</h4>
+          <div style="overflow-x:auto; max-height:300px;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="background:var(--surface);">
+                  <th style="padding:0.5rem; text-align:left;">Q#</th>
+                  <th style="padding:0.5rem; text-align:left;">Your Answer</th>
+                  <th style="padding:0.5rem; text-align:left;">Correct Answer</th>
+                  <th style="padding:0.5rem; text-align:left;">Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${STATE.questions.map(q => {
+        const userAnsIdx = STATE.answers[q.id];
+        const userAns = userAnsIdx !== undefined ? q.options[userAnsIdx] : '<em>Not Answered</em>';
+        const correctAns = q.options[q.correct];
+        const correctClass = userAnsIdx === q.correct ? 'color:var(--success);' : 'color:var(--danger);';
+        return `<tr style="border-top:1px solid var(--border);">
+                  <td style="padding:0.5rem;">${q.id}</td>
+                  <td style="padding:0.5rem;">${userAns}</td>
+                  <td style="padding:0.5rem; ${correctClass}">${correctAns}</td>
+                  <td style="padding:0.5rem;">${q.options.map((opt, idx) => {
+          const isUser = idx === userAnsIdx;
+          const isCorrect = idx === q.correct;
+          let style = '';
+          if (isCorrect) style += 'color:var(--success); font-weight:bold;';
+          if (isUser) style += 'text-decoration:underline;';
+          return `<div style="${style}">${String.fromCharCode(65 + idx)}. ${opt}</div>`;
+        }).join('')}</td>
+                </tr>`;
+      }).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <p style="font-weight:bold; font-size:1.3rem; color:${pass ? 'var(--success)' : 'var(--danger)'};">
+            ${pass ? '✅ PASS - Congratulations!' : '❌ FAIL - Better luck next time'}
+          </p>
+          <button id="downloadResultBtn" class="primary-btn" style="margin-top:1rem;">Download Result</button>
+          <button id="retakeExamBtn" style="margin-top:1rem; margin-left:0.5rem;">Retake Exam</button>
+        </div>
+      `;
+
+      document.getElementById('downloadResultBtn').addEventListener('click', () => {
+        window.print();
+      });
+
+      document.getElementById('retakeExamBtn').addEventListener('click', () => {
+        // Clear exam data and go back to login
+        STATE.answers = {};
+        STATE.reviews = {};
+        STATE.examStarted = false;
+        clearInterval(STATE.timerInterval);
+        localStorage.removeItem('tcs_exam_state');
+        renderLogin();
+      });
+    }
+
+    // ==================== INIT ====================
+    window.addEventListener('load', () => {
+      loadFromLocal();
+      if (STATE.darkMode) document.body.classList.add('dark');
+      if (STATE.examStarted && STATE.questions.length) {
+        startTimer();
+        renderExam();
+      } else if (STATE.candidate.name) {
+        renderInstructions();
+      } else {
+        renderLogin();
+      }
+    });
+  </script>
+</body>
+
+</html>
